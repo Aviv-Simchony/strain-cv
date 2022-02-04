@@ -1,0 +1,1 @@
+streamlit run strain_gui_main_mock.py
