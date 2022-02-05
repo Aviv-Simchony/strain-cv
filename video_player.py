@@ -6,7 +6,8 @@ from mock_jhrecv import jh_recv
 import cv2 as cv
 import numpy as np
 import pandas as pd
-from consolidated_voronoi import ConsolidatedVoronoi
+from scipy.spatial import Voronoi
+
 class VideoPlayer(GuiElement):
     def __init__(self):
         self.has_loop = False
@@ -28,10 +29,6 @@ class VideoPlayer(GuiElement):
         self.q = Queue()
         self.t1 = Thread(target = jh_recv, args =(self.q, ))    
         self.t1.start() #TODO worry! you should do clever things here when you're sober
-
-
-
-
         self.image = st.empty()
         self.marker_locations = st.empty()
         self.display_video = st.checkbox("video")
@@ -60,10 +57,10 @@ class VideoPlayer(GuiElement):
             self.image.image(im)
     
     def add_voronoi(self,im,markers):
-        con_vor = ConsolidatedVoronoi(markers)
-        for ridge in con_vor.ridge_vertices:
+        vor = Voronoi(markers)
+        for ridge in vor.ridge_points:
             if -1 not in ridge:
-                cv.line(im,np.asarray(con_vor.vertices[ridge[0]]).astype(int),np.asarray(con_vor.vertices[ridge[1]]).astype(int),(0, 100, 100), 3)
+                cv.line(im,np.asarray(vor.points[ridge[0]]).astype(int),np.asarray(vor.points[ridge[1]]).astype(int),(0, 100, 100), 3)
     
     def add_markers(self,im):
         markers = []
@@ -83,3 +80,11 @@ class VideoPlayer(GuiElement):
             self.marker_locations.table(pd.DataFrame(markers,columns=("x","y")))
         if self.show_voronoi:
             self.add_voronoi(im,markers)
+    
+
+    def get_local_strain(polygon):
+        polygon = list(set(polygon))
+        if len(polygon != 4):
+            return -1 # TODO somethink
+        
+        

@@ -8,8 +8,6 @@ for element in GUIELEMENTS:
     if element.has_loop:
         have_loop = True
 
-
-
 if have_loop :
     while True:
         for element in GUIELEMENTS:

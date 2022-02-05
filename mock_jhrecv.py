@@ -23,9 +23,9 @@ def jh_recv(out_q):
     strain_counter = 0
     while True:
         if strain_counter > 100:
-            im = Image.open("C:\\Users\\Aviv\\Desktop\\aiohttp_mjpeg-master\\yonghun_cropped.jpg") 
+            im = Image.open("C:\\Users\\Aviv\\Desktop\\aiohttp_mjpeg-master\\yonghun_strained.jpg") 
         else:
-            im = Image.open("C:\\Users\\Aviv\\Desktop\\aiohttp_mjpeg-master\\yonghun_cropped.jpg") 
+            im = Image.open("C:\\Users\\Aviv\\Desktop\\aiohttp_mjpeg-master\\yonghun_strained.jpg") 
         noisy_image_np = np.asarray(im)
         noisy_image = Image.fromarray(noisy_image_np)
         xio2 = io.BytesIO()
