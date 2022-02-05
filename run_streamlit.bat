@@ -1,1 +1,1 @@
-streamlit run strain_gui_main_mock.py
+streamlit run modular_gui_test.py
