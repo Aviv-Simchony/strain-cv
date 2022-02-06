@@ -58,9 +58,9 @@ class VideoPlayer(GuiElement):
     
     def add_voronoi(self,im,markers):
         vor = Voronoi(markers)
-        for ridge in vor.ridge_points:
+        for ridge in vor.ridge_vertices:
             if -1 not in ridge:
-                cv.line(im,np.asarray(vor.points[ridge[0]]).astype(int),np.asarray(vor.points[ridge[1]]).astype(int),(0, 100, 100), 3)
+                cv.line(im,np.asarray(vor.vertices[ridge[0]]).astype(int),np.asarray(vor.vertices[ridge[1]]).astype(int),(0, 100, 100), 3)
     
     def add_markers(self,im):
         markers = []
