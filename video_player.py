@@ -58,9 +58,25 @@ class VideoPlayer(GuiElement):
     
     def add_voronoi(self,im,markers):
         vor = Voronoi(markers)
+        points = {}
         for ridge in vor.ridge_points:
+
             if -1 not in ridge:
-                cv.line(im,np.asarray(vor.points[ridge[0]]).astype(int),np.asarray(vor.points[ridge[1]]).astype(int),(0, 100, 100), 3)
+                point_1 = np.asarray(vor.points[ridge[0]]).astype(int)
+                point_2 = np.asarray(vor.points[ridge[1]]).astype(int)
+                ridge_len = np.linalg.norm(point_1-point_2)
+                if point_1.tostring() not in points:
+                    points[point_1.tostring()] = {}
+                if point_2.tostring() not in points:
+                    points[point_2.tostring()] = {}
+                points[point_1.tostring()][ridge_len] = (point_1,point_2)
+                points[point_2.tostring()][ridge_len] = (point_1,point_2)
+        for key,point in points.items():
+            closest_ridges = [point[i] for i in sorted(point)[:10]]
+            if len(closest_ridges) > 1:
+                for rij in closest_ridges:
+
+                    cv.line(im,rij[0],rij[1],(0, 100, 100), 3)
     
     def add_markers(self,im):
         markers = []
@@ -76,7 +92,7 @@ class VideoPlayer(GuiElement):
                 cv.circle(im, center, 1, 255, 3)
                 # circle outline
                 radius = i[2]
-                cv.circle(im, center, radius, (255, 0, 255), 3)
+                #cv.circle(im, center, radius, (255, 0, 255), 3)
             self.marker_locations.table(pd.DataFrame(markers,columns=("x","y")))
         if self.show_voronoi:
             self.add_voronoi(im,markers)
