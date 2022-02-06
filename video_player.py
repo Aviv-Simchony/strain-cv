@@ -76,7 +76,7 @@ class VideoPlayer(GuiElement):
                 cv.circle(im, center, 1, 255, 3)
                 # circle outline
                 radius = i[2]
-                cv.circle(im, center, radius, (255, 0, 255), 3)
+                #cv.circle(im, center, radius, (255, 0, 255), 3)
             self.marker_locations.table(pd.DataFrame(markers,columns=("x","y")))
         if self.show_voronoi:
             self.add_voronoi(im,markers)

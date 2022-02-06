@@ -18,7 +18,7 @@ def jh_recv(out_q):
         stretched_image.save(xio2,format="jpeg")
         time.sleep(1.0/25)
         out_q.put(xio2.getbuffer())
-        strain_counter += 0.1
+        strain_counter += 1
         
 
 
