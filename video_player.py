@@ -15,6 +15,8 @@ class VideoPlayer(GuiElement):
     def preloop(self):
         with st.sidebar:
             with st.expander("marker detection settings"):
+                self.image_threshold = st.slider("Image threshold",0,255,69,1)
+                self.threshold_image = st.checkbox("Threshold image")
                 self.detect_edges = st.checkbox("show edge detection")
                 self.canny_threshold = st.slider("edge detector threshold",0,255,35,1)
                 self.marker_threshold = st.slider("marker detection threshold",0,40,18,1)
@@ -24,7 +26,6 @@ class VideoPlayer(GuiElement):
                 self.show_line = st.checkbox("show minimum distance")
                 self.min_dist = st.slider("minium distance between markers",0,300,110,1)
                 self.dp = st.slider("Accumulator resolution",1.0,3.0,1.3,0.1)
-
 
         self.q = Queue()
         self.t1 = Thread(target = jh_recv, args =(self.q, ))    
@@ -42,12 +43,15 @@ class VideoPlayer(GuiElement):
             frame = self.q.get()
             self.q.queue.clear()
             im = cv.split(cv.imdecode(np.asarray(frame),cv.IMREAD_ANYCOLOR))[1]
+            if self.threshold_image:
+                  ret,im = cv.threshold(im,self.image_threshold,255,cv.THRESH_BINARY)
 
             if self.show_markers:
-              self.add_markers(im)
+                
+                self.add_markers(im)
             if self.detect_edges:
                 im = cv.Canny(im,self.canny_threshold/2,self.canny_threshold)
-
+              
             if self.show_circles:
                 cv.circle(im, (100,100), self.minimum_radius, (0, 100, 100), 3)
                 cv.circle(im, (100,100), self.maximum_radius, (0, 100, 100), 3)
@@ -73,10 +77,15 @@ class VideoPlayer(GuiElement):
                 center = (i[0], i[1])
                 markers.append(center)
                 # circle center
-                cv.circle(im, center, 1, 255, 3)
+                cv.circle(im, center, 1, 0, 3)
                 # circle outline
                 radius = i[2]
                 #cv.circle(im, center, radius, (255, 0, 255), 3)
+
+            for marker in markers:
+                marker_region = im[(marker[0]-self.maximum_radius):(marker[0]+self.maximum_radius)][(marker[1]-self.maximum_radius):(marker[1]+self.maximum_radius)]
+                
+
             self.marker_locations.table(pd.DataFrame(markers,columns=("x","y")))
         if self.show_voronoi:
             self.add_voronoi(im,markers)
