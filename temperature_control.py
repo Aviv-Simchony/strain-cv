@@ -11,7 +11,7 @@ class TemperatureControl(GuiElement):
         self.thermometer = mock_instruments.Thermometer()
         self.heater = mock_instruments.Heater(self.thermometer) 
     
-    def preloop(self):
+    def __enter__(self):
         with st.sidebar:
             self.set_T   = st.slider("Camera Temperarture",100,250,185,5)
             self.min_cur = st.slider("Minimum current", 0.0, 0.5, 0.19, 0.01)
@@ -49,3 +49,6 @@ class TemperatureControl(GuiElement):
             if np.random.uniform(0,1) < 0.2:
                 self.heater.heat(np.random.uniform(-5,5))
         sleep(0.01)
+
+    def __exit__(self, exc_type, exc_value, exc_traceback):
+        print("exiting temp controller, should cleverness ensue?")

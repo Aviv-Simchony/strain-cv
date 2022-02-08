@@ -1,7 +1,7 @@
 from gui_element import GuiElement
 import streamlit as st
 from queue import Queue
-from threading import Thread
+from kthread import KThread
 from mock_jhrecv import jh_recv
 import cv2 as cv
 import numpy as np
@@ -11,8 +11,13 @@ from scipy.spatial import Voronoi
 class VideoPlayer(GuiElement):
     def __init__(self):
         self.has_loop = False
+    
+    def __exit__(self, exc_type, exc_value, exc_traceback):
+        print("should close thread")
+        if self.display_video:
+            self.t1.terminate()
 
-    def preloop(self):
+    def __enter__(self):
         with st.sidebar:
             with st.expander("marker detection settings"):
                 self.detect_edges = st.checkbox("show edge detection")
@@ -26,15 +31,18 @@ class VideoPlayer(GuiElement):
                 self.dp = st.slider("Accumulator resolution",1.0,3.0,1.3,0.1)
 
 
-        self.q = Queue()
-        self.t1 = Thread(target = jh_recv, args =(self.q, ))    
-        self.t1.start() #TODO worry! you should do clever things here when you're sober
-        self.image = st.empty()
+        
+        
         self.marker_locations = st.empty()
         self.display_video = st.checkbox("video")
         self.show_markers = st.checkbox("show markers")
         self.show_voronoi = st.checkbox("show voronoi")
         self.local_strain = st.checkbox("find local strain")
+        if self.display_video:
+            self.q = Queue()
+            self.t1 = KThread(target = jh_recv, args =(self.q, ))    
+            self.t1.start() #TODO worry! you should do clever things here when you're sober
+            self.image = st.empty()
         self.has_loop = self.display_video
     
     def loop(self):

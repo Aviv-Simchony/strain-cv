@@ -44,7 +44,7 @@ def jh_recv(out_q):
                             if framecount%10 == 0:
                                 s.sendto(b"JHCMD\xd0\x01", (HOST, SPORT))
                         frame_bytes += data[8:]
-                except:
+                except socket.error:
                     time.sleep(0.01)
         # Stop data command, like in naStop()
         s.sendto(b"JHCMD\xd0\x02", (HOST, SPORT))
