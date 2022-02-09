@@ -49,7 +49,8 @@ class VideoPlayer(GuiElement):
         if self.display_video: 
             frame = self.q.get()
             self.q.queue.clear()
-            im = cv.split(cv.imdecode(np.asarray(memoryview(frame)),cv.IMREAD_ANYCOLOR))[1]
+            #im = cv.split(cv.imdecode(np.asarray(frame),cv.IMREAD_ANYCOLOR))[1]
+            im = cv.imdecode(np.asarray(frame),cv.IMREAD_GRAYSCALE)
 
             if self.show_markers:
               self.add_markers(im)

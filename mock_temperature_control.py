@@ -1,29 +1,23 @@
 from gui_element import GuiElement
-import instruments
+import mock_instruments
 from time import time, sleep
 import altair as alt
 import pandas as pd
 import numpy as np
-import pyvisa
 import streamlit as st
-
 class TemperatureControl(GuiElement):
     def __init__(self):
-        self.rm = pyvisa.ResourceManager()
         self.has_loop = False
-        self.thermometer = instruments.Thermometer(self.rm)
-        self.heater = instruments.Heater(self.rm) 
+        self.thermometer = mock_instruments.Thermometer()
+        self.heater = mock_instruments.Heater(self.thermometer) 
     
     def __enter__(self):
         with st.sidebar:
-            self.set_T   = st.slider("Camera Temperarture",100,320,170,5)
-            self.min_cur = st.slider("Minimum current(mA)", 0, 500, 0, 2)/1000.0
-            self.max_cur = st.slider("Maximum current(mA)", 0, 500, 0, 2)/1000.0
+            self.set_T   = st.slider("Camera Temperarture",100,250,185,5)
+            self.min_cur = st.slider("Minimum current", 0.0, 0.5, 0.19, 0.01)
+            self.max_cur = st.slider("Maximum current", 0.0, 0.5, 0.2, 0.01)
             self.control_temp = st.checkbox("control temperature")
         self.chart = st.empty()
-        """
-        Remember to turn set heater current to 0
-        """
         self.display_temp = st.checkbox("show temperature")
         source = pd.DataFrame({'time': [], 'T': []})
         self.new_rows_df = pd.DataFrame({'time': [], 'T':[] })
@@ -49,9 +43,11 @@ class TemperatureControl(GuiElement):
         if self.control_temp:
             curr_temp = self.thermometer.read_T()
             if curr_temp <= self.set_T:
-                self.heater.heat(self.max_cur)
+                self.heater.heat()
             else:
-                self.heater.heat(self.min_cur)
+                self.heater.chill()
+            if np.random.uniform(0,1) < 0.2:
+                self.heater.heat(np.random.uniform(-5,5))
         sleep(0.01)
 
     def __exit__(self, exc_type, exc_value, exc_traceback):

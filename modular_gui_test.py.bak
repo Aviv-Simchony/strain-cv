@@ -2,9 +2,9 @@ from gui_elements import TemperatureControl, VideoPlayer
 import streamlit as st
 from contextlib import ExitStack
 GUIELEMENTS = [TemperatureControl() ,VideoPlayer()]
-"""
-Remember to turn set heater current to 0
-"""
+        """
+        Remember to turn set heater current to 0
+        """
 with ExitStack() as stack:
     have_loop = False
     for element in GUIELEMENTS:

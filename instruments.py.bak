@@ -36,7 +36,10 @@ class Heater():
         if self.INSTRUMENT_NAME not in self.manager.query('*IDN?'):
             raise(self.INSTRUMENT_NAME +" not detected in address: " + gpib_addr)
         self.manager.write(":configure:voltage")
+        #self.manager.write(":voltage:range maximum")
+        
         self.manager.write(":source:function:mode current")
+        #self.manager.write(":source:current:range maximum")
     
     def heat(self,current):
         self.manager.write(":source:current:level:immediate:amplitude " + str(current))
