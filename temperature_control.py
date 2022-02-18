@@ -8,7 +8,7 @@ import pyvisa
 import streamlit as st
 
 class TemperatureControl(GuiElement):
-    def __init__(self):
+    def __init__(self,mock=False):
         self.rm = pyvisa.ResourceManager()
         self.has_loop = False
         self.thermometer = instruments.Thermometer(self.rm)

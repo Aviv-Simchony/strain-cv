@@ -1,6 +1,7 @@
 import pandas as pd
 from scipy import interpolate
 import numpy as np
+import thorlabs_apt as apt
 
 class Thermometer():
     INSTRUMENT_NAME = "MODEL 2400"
@@ -41,3 +42,33 @@ class Heater():
     def heat(self,current):
         self.manager.write(":source:current:level:immediate:amplitude " + str(current))
         self.manager.query(':measure:voltage?')
+
+class Actuatuor():
+
+    def __init__(self,accn,max_velocity,jog_size,move_home):
+        available_motors = apt.list_available_devices()
+        if len(available_motors) != 1:
+            raise(Exception("1 and only 1 motor must be connected"))
+        self.motor = apt.Motor(available_motors[0][1])
+        if move_home:
+            self.home()
+        self.motor.set_velocity_parameters(0,accn,max_velocity)
+        self.jog_size = jog_size
+    
+    def home(self):
+        self.motor.move_home()
+    
+    def is_homed(self):
+        return self.motor.has_homing_been_completed
+    
+    def set_jog_size(self,size):
+        self.jog_size(size)
+    
+    def get_position(self):
+        return self.motor.position
+    
+    def jog_up(self):
+        self.motor.move_by(self.jog_size)
+
+    def jog_down(self):
+        self.motor.move_by(-self.jog_size)
