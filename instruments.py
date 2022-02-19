@@ -4,11 +4,11 @@ import numpy as np
 import thorlabs_apt as apt
 
 class Thermometer():
-    INSTRUMENT_NAME = "MODEL 2400"
-    def __init__(self,rm, gpib_addr = "02"): #TODO Make me more generic
+    #INSTRUMENT_NAME = "MODEL 2400"
+    def __init__(self,rm, gpib_addr = "15"): #TODO Make me more generic
         self.manager = rm.open_resource('GPIB0::' + gpib_addr + '::INSTR')
-        if self.INSTRUMENT_NAME not in self.manager.query('*IDN?'):
-            raise(self.INSTRUMENT_NAME +" not detected in address: " + gpib_addr)
+        #if self.INSTRUMENT_NAME not in self.manager.query('*IDN?'):
+         #   raise(self.INSTRUMENT_NAME +" not detected in address: " + gpib_addr)
         self.manager.write(":configure:resistance")
         A = 3.9083e-3
         B = -5.775e-7
@@ -19,19 +19,21 @@ class Thermometer():
         self.table = interpolate.interp1d(rs_table, ts_table, fill_value='extrapolate')
         
 #set measurement to auto range and auto decide what current to source
-        self.manager.write(":resistance:range:AUTO 1")
-        self.manager.write(":resistance:MODE AUTO")
+        #self.manager.write(":resistance:range:AUTO 1")
+        #self.manager.write(":resistance:MODE AUTO")
     
     def read_T(self):
-        reading = self.manager.query(':measure:resistance?')
-        R = float(reading.split(',')[2])
+        #reading = self.manager.query(':measure:resistance?')
+        R = float(self.manager.query('getdat? 16 1').split(';')[0].split(',')[2])
+        
+        #R = float(reading.split(',')[2])
         return self.translate_T(R)
     
     def translate_T(self,R):
         return self.table(R)+273
 
 class Heater():
-    INSTRUMENT_NAME = "MODEL 2410"
+    INSTRUMENT_NAME = "MODEL 2400"
     def __init__(self,rm,gpib_addr = "01"):
         self.manager = rm.open_resource('GPIB0::' + gpib_addr + '::INSTR')
         if self.INSTRUMENT_NAME not in self.manager.query('*IDN?'):
@@ -62,7 +64,7 @@ class Actuatuor():
         return self.motor.has_homing_been_completed
     
     def set_jog_size(self,size):
-        self.jog_size(size)
+        self.jog_size = size
     
     def get_position(self):
         return self.motor.position
